@@ -258,6 +258,10 @@ header {
   grid-template-columns: repeat(10, 1fr);
 }
 
+.hidden{
+  display: none;
+}
+
 /* // Media Queries */
 @media (max-width: 1024px) {
   .game-container {
