@@ -255,7 +255,7 @@ header {
 }
 
 .extreme {
-  grid-template-columns: repeat(9, 1fr);
+  grid-template-columns: repeat(10, 1fr);
 }
 
 /* // Media Queries */
@@ -360,4 +360,16 @@ header {
       }
     }
   }
+
+  /* .medium {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .hard {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .extreme {
+    grid-template-columns: repeat(8, 1fr);
+  } */
 }
