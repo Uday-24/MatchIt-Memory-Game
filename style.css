@@ -243,10 +243,10 @@ header {
       transform-style: preserve-3d;
 
       /* Testing purpose only start */
-      i{
+      /* i{
         color: white;
         text-align: center;
-      }
+      } */
       /* Testing purpose only end */
 
       .card-front,

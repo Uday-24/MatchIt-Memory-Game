@@ -38,7 +38,7 @@ function createCards(cards) {
         card_front_div.dataset.name = card.name;
 
         card_back_div.append(newIcon);
-        inner_card_div.append(newIcon); //For testing purpose
+        // inner_card_div.append(newIcon); //For testing purpose
         inner_card_div.append(card_front_div);
         inner_card_div.append(card_back_div);
         card_div.append(inner_card_div);
