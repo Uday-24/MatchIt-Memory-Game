@@ -38,6 +38,7 @@ function createCards(cards) {
         card_front_div.dataset.name = card.name;
 
         card_back_div.append(newIcon);
+        // inner_card_div.append(newIcon); //For testing purpose
         inner_card_div.append(card_front_div);
         inner_card_div.append(card_back_div);
         card_div.append(inner_card_div);
@@ -78,45 +79,56 @@ function loadData(number, data) {
     createCards(shuffled_data);
 }
 
+function addRemoveClasses(elements, cls, task){
+    elements.forEach((elem)=>{
+        task === "add" ? elem.classList.add(cls) : elem.classList.remove(cls);
+    });
+}
+
 function playingGame(pairs) {
+
     let click_counter = 0;
     let clicked_index = -1;
-    let first_card = "";
-    let first_card_parent = "";
-    let second_card = "";
-    let second_card_parent = "";
+    let selected_cards = [];
+    let parent_cards = [];
     let matched_cards = [];
+
     card_area.addEventListener("mousedown", (event) => {
-        if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.name)) {
+        
+        if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index)) {
+
             click_counter++;
+            parent_cards.push(event.target.closest('.card'));
+            addRemoveClasses(parent_cards, "flipped", "add");
+            
+            selected_cards.push(event.target);
+
             if (click_counter === 1) {
-                first_card = event.target;
-                first_card_parent = event.target.closest('.card');
                 clicked_index = event.target.dataset.index;
-                first_card_parent.classList.toggle("flipped");
             }
             else if (click_counter === 2) {
-                second_card = event.target;
-                second_card_parent = event.target.closest('.card');
-                second_card_parent.classList.toggle("flipped");
-
                 setTimeout(() => {
-                    if (first_card.dataset.name === second_card.dataset.name) {
-                        matched_cards.push(first_card.dataset.name);
-                        first_card.classList.add("matched");
-                        second_card.classList.add("matched");
+                    if (selected_cards[0].dataset.name === selected_cards[1].dataset.name) {
+                        matched_cards.push(selected_cards[0].dataset.index);
+                        matched_cards.push(selected_cards[1].dataset.index);
+                        addRemoveClasses(selected_cards, "matched", "add");
+                        console.log("Matched");
                     }
 
-                    second_card_parent.classList.toggle("flipped");
-                    first_card_parent.classList.toggle("flipped");
+                    addRemoveClasses(parent_cards, "flipped", "remove");
+                    parent_cards = [];
+                    selected_cards = [];
                     clicked_index = -1;
                     click_counter = 0;
 
-                    if(pairs === matched_cards.length){
+                    if(pairs*2 === matched_cards.length){
                         alert("You won");
                     }
                 }, 500);
+
             } else {
+                parent_cards = [];
+                selected_cards = [];
                 click_counter = 0;
                 clicked_index = -1;
             }
@@ -165,12 +177,14 @@ play_button.addEventListener("click", (event) => {
         }
         else if (selected_difficulty === "hard") {
             loadData(32, cardArray);
+            playingGame(32);
         }
         else if (selected_difficulty === "extreme") {
             let random_num = Math.floor(Math.random() * 30);
             let repeated_cards = cardArray.slice(random_num, random_num + 10);
             let total_cards = cardArray.concat(repeated_cards);
             loadData(50, total_cards);
+            playingGame(50);
         }
     }
 });
