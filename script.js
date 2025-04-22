@@ -95,7 +95,7 @@ function playingGame(pairs) {
 
     card_area.addEventListener("mousedown", (event) => {
         
-        if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index)) {
+        if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index) && click_counter < 2) {
 
             click_counter++;
             parent_cards.push(event.target.closest('.card'));
