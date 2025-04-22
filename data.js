@@ -33,5 +33,10 @@ const cardArray = [
     { name: "info", icon: "fa-solid fa-circle-info" },
     { name: "help", icon: "fa-solid fa-circle-question" },
     { name: "download cloud", icon: "fa-solid fa-cloud-arrow-down" },
-    { name: "upload cloud", icon: "fa-solid fa-cloud-arrow-up" }
+    { name: "upload cloud", icon: "fa-solid fa-cloud-arrow-up" },
+    { name: "battery", icon: "fa-solid fa-battery-full" },
+    { name: "shield", icon: "fa-solid fa-shield-halved" },
+    { name: "sun", icon: "fa-solid fa-sun" },
+    { name: "moon", icon: "fa-solid fa-moon" },
+    { name: "bug", icon: "fa-solid fa-bug" }
 ];

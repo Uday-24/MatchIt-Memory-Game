@@ -239,6 +239,10 @@ header {
     &:hover {
       background: #4bcfff;
     }
+
+    i{
+      font-size: 3vw;
+    }
   }
 }
 
@@ -280,6 +284,7 @@ header {
       font-size: 18px;
     }
   }
+
 }
 
 @media (max-width: 768px) {
@@ -363,6 +368,10 @@ header {
         font-size: 10px;
       }
     }
+  }
+
+  .card-area .card i{
+    font-size: 5vw;
   }
 
   /* .medium {

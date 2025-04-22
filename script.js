@@ -15,6 +15,8 @@ function createCards(cards){
         let newIcon = document.createElement("i");
         newIcon.className = card.icon
         newCard.classList.add("card");
+        newCard.dataset.index = idx;
+        newCard.dataset.name = card.name;
         newCard.append(newIcon);
         cardarea.append(newCard);
     });
@@ -25,11 +27,25 @@ function hideUnhide(){
     document.querySelector(".card-area").classList.remove("hidden");
 }
 
-function getData(number, data){
-    let random_num = Math.floor(Math.random() * 28);
-    let filtered_data = data.slice(random_num, random_num + number);
-    return filtered_data;
+function shuffleCards(cards){
+    let len = cards.length;
+    for(let i=len-1; i>0; i--){
+        let random_idx = Math.floor(Math.random() * i + 1);
+        let temp = cards[i];
+        cards[i] = cards[random_idx];
+        cards[random_idx] = temp;
+    }
+    return cards;
 }
+
+function loadData(number, data){
+    let random_num = Math.floor(Math.random() * (data.length - (number-1)));
+    let filtered_data = data.slice(random_num, random_num + number);
+    filtered_data = filtered_data.concat(filtered_data);
+    let shuffled_data = shuffleCards(filtered_data);
+    createCards(shuffled_data);
+}
+
 
 const game_mode = document.querySelector('.game-mode-buttons');
 const difficulty = document.querySelector(".difficulty-buttons");
@@ -62,18 +78,50 @@ play_button.addEventListener("click", (event)=>{
     if(selected_mode === "basic"){
         card_area.classList.add(selected_difficulty);
         if(selected_difficulty === "easy"){
-            let data = getData(8, cardArray);
-            data = data.concat(data);
-            createCards(data);
+            loadData(8, cardArray);
         }
         else if(selected_difficulty === "medium"){   
-            createCards(36);
+            loadData(18, cardArray);
         }
         else if(selected_difficulty === "hard"){
-            createCards(64);
+            loadData(32, cardArray);
         }
         else if(selected_difficulty === "extreme"){
-            createCards(100);
+            let random_num = Math.floor(Math.random() * 30);
+            let repeated_cards = cardArray.slice(random_num, random_num + 10);
+            let total_cards = cardArray.concat(repeated_cards);
+            loadData(50, total_cards);
         }
+    }
+});
+
+let click_counter = 0;
+let clicked_index = -1;
+let first_card = "";
+let second_card = "";
+let matched_cards = [];
+card_area.addEventListener("click", (event)=>{
+    if(event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.name)){
+        click_counter++;
+        if(click_counter === 1){
+            first_card = event.target;
+            first_card.style.border = "5px solid purple";
+            clicked_index = event.target.dataset.index;
+            console.log(first_card);
+        }
+        else if(click_counter === 2){
+            second_card = event.target;
+            second_card.style.border = "5px solid purple";
+            if(first_card.dataset.name === second_card.dataset.name){
+                matched_cards.push(first_card.dataset.name);
+                first_card.style.border = "5px solid orange";
+                second_card.style.border = "5px solid orange";
+            }else{
+                first_card.style.border = "none";
+                second_card.style.border = "none";
+            }
+            click_counter = 0;
+        }
+        console.log("click");
     }
 });
