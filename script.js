@@ -89,7 +89,8 @@ function addRemoveClasses(elements, cls, task) {
 function showScreen(title, message) {
     card_area.classList.add("hidden");
     document.querySelector("#win-screen").classList.remove("hidden");
-    document.querySelector(".win-message h1").innerText = title;
+    document.querySelector(".win-message .title").innerText = title;
+    document.querySelector(".win-message .message").innerText = message;
 }
 
 function resetGame() {
@@ -99,6 +100,9 @@ function resetGame() {
     document.querySelector(".timer").classList.add("hidden");
     document.querySelector(".game-container").classList.remove("hidden");
     attempts = 0;
+    time = 0;
+    document.querySelector(".one-v-one-mode").classList.add("hidden");
+    player_score = [0, 0];
 }
 
 function resetTurn() {
@@ -108,47 +112,42 @@ function resetTurn() {
     parent_cards = [];
 }
 
-function playingGame(difficulty_, game_mode = "basic", time = 0) {
+function pushSelectedCardsIfMatched() {
+    matched_cards.push(selected_cards[0].dataset.index);
+    matched_cards.push(selected_cards[1].dataset.index);
+}
 
-    if(game_mode === "timer"){
-        switch (difficulty_) {
-            case "easy": pairs = 8, time = 30;
+function updateScore(){
+    document.querySelector("#player-1-score").innerText = player_score[0];
+    document.querySelector("#player-2-score").innerText = player_score[1];
+}
+
+function playingGame(game_mode = "basic") {
+
+    switch (selected_difficulty) {
+        case "easy": pairs = 8, time = 30;
             break;
-            case "medium": pairs = 18, time = 120;
+        case "medium": pairs = 18, time = 120;
             break;
-            case "hard": pairs = 32, time = 240;
+        case "hard": pairs = 32, time = 240;
             break;
-            case "extreme": pairs = 50, time = 360;
+        case "extreme": pairs = 50, time = 360;
             break;
-            default: pairs = 8, time = 30;
-        }
+        default: pairs = 8, time = 30;
     }
-    
-    const timerInterval = setInterval(() => {
-        if (game_mode === "timer") {
-            time--;
-            timer_elem.innerText = time;
-        }else if(game_mode === "basic"){
-            time++;
-            timer_elem.innerText = time;
-        }
-        if (time < 0) {
-            click_counter = 0;
-            clicked_index = -1;
-            selected_cards = [];
-            parent_cards = [];
-            matched_cards = [];
-            clearInterval(timerInterval);
-            showScreen("😝 You Loose! 😝", "");
-            return;
-        }
-    }, 1000);
-    
-    setTimeout(()=>{
-        if (game_mode === "timer" || game_mode === "basic") {
-            document.querySelector(".timer").classList.remove("hidden");
-        }
-    }, 1000);
+
+    // if(difficulty_)
+
+    if(game_mode === "basic"){
+        time = 0;
+    }
+
+    if (game_mode === "timer" || game_mode === "basic") {
+        document.querySelector(".timer").classList.remove("hidden");
+    }
+    else if (game_mode === "1v1") {
+        document.querySelector(".one-v-one-mode").classList.remove("hidden");
+    }
 }
 
 
@@ -159,6 +158,7 @@ const available_difficulties = ["easy", "medium", "hard", "extreme"];
 const play_button = document.querySelector("#play-button");
 const card_area = document.querySelector(".card-area");
 const home_button = document.querySelector("#home-button");
+const players = document.querySelectorAll(".player");
 
 
 let selected_mode = "basic";
@@ -187,6 +187,7 @@ difficulty.addEventListener("click", (event) => {
 });
 
 let timer_elem = document.querySelector("#time");
+let time = 0;
 let timerInterval;
 let attempts = 0;
 let click_counter = 0;
@@ -195,38 +196,84 @@ let selected_cards = [];
 let parent_cards = [];
 let matched_cards = [];
 let pairs;
+let player_score = [0, 0];
+let player_turn = 0;
+let completion_time = 0;
 
 play_button.addEventListener("click", (event) => {
     hideUnhide();
     card_area.classList.add(selected_difficulty);
     loadData(selected_difficulty, total_cards);
-    playingGame(selected_difficulty, selected_mode);
+    playingGame(selected_mode);
+    if(selected_mode === "1v1"){
+        updateScore();
+    }
 });
 
 home_button.addEventListener('click', () => {
     resetGame();
 });
 
+if (selected_mode !== "1v1") {
+    const timerInterval = setInterval(() => {
+        if (selected_mode === "timer") {
+            time--;
+            timer_elem.innerText = time;
+        } else if (selected_mode === "basic") {
+            time++;
+            timer_elem.innerText = time;
+            completion_time = time;
+        }
+        if (time < 0) {
+            click_counter = 0;
+            clicked_index = -1;
+            selected_cards = [];
+            parent_cards = [];
+            matched_cards = [];
+            clearInterval(timerInterval);
+            showScreen("You Loose!", `You couldn't complete the ${selected_difficulty} level of Timer mode. Better luck next time!`);
+            return;
+        }
+    }, 1000);
+
+    setTimeout(() => {
+    }, 1000);
+}
+
 card_area.addEventListener("mousedown", (event) => {
-
     if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index) && click_counter < 2) {
-        console.log(pairs);
+        console.log(attempts);
         click_counter++;
-        attempts++;
         parent_cards.push(event.target.closest('.card'));
-        addRemoveClasses(parent_cards, "flipped", "add");
-
         selected_cards.push(event.target);
+        addRemoveClasses(parent_cards, "flipped", "add");
 
         if (click_counter === 1) {
             clicked_index = event.target.dataset.index;
         }
         else if (click_counter === 2) {
+            attempts++;
             setTimeout(() => {
                 if (selected_cards[0].dataset.name === selected_cards[1].dataset.name) {
-                    matched_cards.push(selected_cards[0].dataset.index);
-                    matched_cards.push(selected_cards[1].dataset.index);
+                    pushSelectedCardsIfMatched();
                     addRemoveClasses(selected_cards, "matched", "add");
+                    if(selected_mode === "1v1"){
+                        player_score[player_turn]++;
+                        updateScore();
+                    }
+                }else{
+                    if(selected_mode === "1v1"){
+                        if(player_turn === 0) {
+                            player_turn = 1;
+                            players[1].classList.add("active");
+                            players[0].classList.remove("active");
+                        }
+                        else{
+                            player_turn = 0;
+                            players[1].classList.remove("active");
+                            players[0].classList.add("active");
+                        }
+                    }
                 }
 
                 addRemoveClasses(parent_cards, "flipped", "remove");
@@ -234,9 +281,19 @@ card_area.addEventListener("mousedown", (event) => {
 
                 if (pairs * 2 === matched_cards.length) {
                     matched_cards = [];
-                    clearInterval(timerInterval);
-                    let win_title = "🎉 You Win! 🎉";
-                    let win_message = "";
+                    let win_title = "You Win!";
+                    let win_message = `Boom! You crushed the ${selected_difficulty} level of ${selected_mode} mode in just ${attempts} attempts! and ${completion_time} seconds!`;
+                    if (selected_mode !== "1v1") {
+                        clearInterval(timerInterval);
+                    }else{
+                        if(player_score[0] > player_score[1]){
+                            win_title = "Player 1 Wins!"
+                        }else if(player_score[0] < player_score[1]){
+                            win_title = "Player 2 Wins!"
+                        }else{
+                            win_title = "Both Win!"
+                        }
+                    }
                     showScreen(win_title, win_message);
                 }
             }, 500);
