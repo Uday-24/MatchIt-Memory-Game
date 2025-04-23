@@ -47,8 +47,8 @@ function createCards(cards) {
 }
 
 function hideUnhide() {
-    document.querySelector(".game-container").classList.add("hidden");
-    document.querySelector(".card-area").classList.remove("hidden");
+    game_container.classList.add("hidden");
+    card_area.classList.remove("hidden");
 }
 
 function shuffleCards(cards) {
@@ -103,7 +103,7 @@ function resetGame() {
     document.querySelector("#win-screen").classList.add("hidden");
     document.querySelector(".timer").classList.add("hidden");
     document.querySelector(".one-v-one-mode").classList.add("hidden");
-    document.querySelector(".game-container").classList.remove("hidden");
+    game_container.classList.remove("hidden");
     pause_button_div.classList.add("hidden");
     resume_button_div.classList.add("hidden");
 }
@@ -181,7 +181,7 @@ function playingGame() {
     }
 }
 
-
+const game_container = document.querySelector(".game-container");
 const game_mode = document.querySelector('.game-mode-buttons');
 const difficulty = document.querySelector(".difficulty-buttons");
 const available_modes = ["basic", "timer", "1v1"];
