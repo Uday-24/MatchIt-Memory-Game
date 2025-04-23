@@ -94,15 +94,18 @@ function showScreen(title, message) {
 }
 
 function resetGame() {
+    attempts = 0;
+    time = 0;
+    player_score = [0, 0];
+    isPlaying = false;
     card_area.innerHTML = "";
     card_area.className = "card-area hidden";
     document.querySelector("#win-screen").classList.add("hidden");
     document.querySelector(".timer").classList.add("hidden");
-    document.querySelector(".game-container").classList.remove("hidden");
-    attempts = 0;
-    time = 0;
     document.querySelector(".one-v-one-mode").classList.add("hidden");
-    player_score = [0, 0];
+    document.querySelector(".game-container").classList.remove("hidden");
+    pause_button_div.classList.add("hidden");
+    resume_button_div.classList.add("hidden");
 }
 
 function resetTurn() {
@@ -117,12 +120,38 @@ function pushSelectedCardsIfMatched() {
     matched_cards.push(selected_cards[1].dataset.index);
 }
 
-function updateScore(){
+function updateScore() {
     document.querySelector("#player-1-score").innerText = player_score[0];
     document.querySelector("#player-2-score").innerText = player_score[1];
 }
 
-function playingGame(game_mode = "basic") {
+function startInterval(){
+    timerInterval = setInterval(() => {
+        if (selected_mode === "timer") {
+            time--;
+            timer_elem.innerText = time;
+            completion_time = time;
+        } else if (selected_mode === "basic") {
+            time++;
+            timer_elem.innerText = time;
+            completion_time = time;
+        }
+        if (time < 0) {
+            click_counter = 0;
+            clicked_index = -1;
+            selected_cards = [];
+            parent_cards = [];
+            matched_cards = [];
+            clearInterval(timerInterval);
+            showScreen("You Loose!", `You couldn't complete the ${selected_difficulty} level of Timer mode. Better luck next time!`);
+            return;
+        }
+    }, 1000);
+}
+
+function playingGame() {
+
+    isPlaying = true;
 
     switch (selected_difficulty) {
         case "easy": pairs = 8, time = 30;
@@ -136,17 +165,19 @@ function playingGame(game_mode = "basic") {
         default: pairs = 8, time = 30;
     }
 
-    // if(difficulty_)
 
-    if(game_mode === "basic"){
-        time = 0;
-    }
-
-    if (game_mode === "timer" || game_mode === "basic") {
-        document.querySelector(".timer").classList.remove("hidden");
-    }
-    else if (game_mode === "1v1") {
+    if (selected_mode === "1v1") {
         document.querySelector(".one-v-one-mode").classList.remove("hidden");
+    } else {
+        if (selected_mode === "basic") {
+            time = 1;
+            timer_elem.innerText = time;
+        } else {
+            timer_elem.innerText = time;
+        }
+        startInterval();
+        document.querySelector(".timer").classList.remove("hidden");
+        pause_button_div.classList.remove("hidden");
     }
 }
 
@@ -159,6 +190,10 @@ const play_button = document.querySelector("#play-button");
 const card_area = document.querySelector(".card-area");
 const home_button = document.querySelector("#home-button");
 const players = document.querySelectorAll(".player");
+const pause_button_div = document.querySelector(".pause-btn");
+const pause_button = document.querySelector("#pause-button");
+const resume_button_div = document.querySelector(".resume-btn");
+const resume_button = document.querySelector("#resume-button");
 
 
 let selected_mode = "basic";
@@ -187,7 +222,7 @@ difficulty.addEventListener("click", (event) => {
 });
 
 let timer_elem = document.querySelector("#time");
-let time = 0;
+let time = 1;
 let timerInterval;
 let attempts = 0;
 let click_counter = 0;
@@ -199,13 +234,14 @@ let pairs;
 let player_score = [0, 0];
 let player_turn = 0;
 let completion_time = 0;
+let isPlaying = false;
 
 play_button.addEventListener("click", (event) => {
     hideUnhide();
     card_area.classList.add(selected_difficulty);
     loadData(selected_difficulty, total_cards);
-    playingGame(selected_mode);
-    if(selected_mode === "1v1"){
+    playingGame();
+    if (selected_mode === "1v1") {
         updateScore();
     }
 });
@@ -214,35 +250,10 @@ home_button.addEventListener('click', () => {
     resetGame();
 });
 
-if (selected_mode !== "1v1") {
-    const timerInterval = setInterval(() => {
-        if (selected_mode === "timer") {
-            time--;
-            timer_elem.innerText = time;
-        } else if (selected_mode === "basic") {
-            time++;
-            timer_elem.innerText = time;
-            completion_time = time;
-        }
-        if (time < 0) {
-            click_counter = 0;
-            clicked_index = -1;
-            selected_cards = [];
-            parent_cards = [];
-            matched_cards = [];
-            clearInterval(timerInterval);
-            showScreen("You Loose!", `You couldn't complete the ${selected_difficulty} level of Timer mode. Better luck next time!`);
-            return;
-        }
-    }, 1000);
-
-    setTimeout(() => {
-    }, 1000);
-}
-
 card_area.addEventListener("mousedown", (event) => {
-    if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index) && click_counter < 2) {
-        console.log(attempts);
+    
+    if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index) && click_counter < 2 && isPlaying) {
+        
         click_counter++;
         parent_cards.push(event.target.closest('.card'));
         selected_cards.push(event.target);
@@ -257,18 +268,18 @@ card_area.addEventListener("mousedown", (event) => {
                 if (selected_cards[0].dataset.name === selected_cards[1].dataset.name) {
                     pushSelectedCardsIfMatched();
                     addRemoveClasses(selected_cards, "matched", "add");
-                    if(selected_mode === "1v1"){
+                    if (selected_mode === "1v1") {
                         player_score[player_turn]++;
                         updateScore();
                     }
-                }else{
-                    if(selected_mode === "1v1"){
-                        if(player_turn === 0) {
+                } else {
+                    if (selected_mode === "1v1") {
+                        if (player_turn === 0) {
                             player_turn = 1;
                             players[1].classList.add("active");
                             players[0].classList.remove("active");
                         }
-                        else{
+                        else {
                             player_turn = 0;
                             players[1].classList.remove("active");
                             players[0].classList.add("active");
@@ -283,23 +294,42 @@ card_area.addEventListener("mousedown", (event) => {
                     matched_cards = [];
                     let win_title = "You Win!";
                     let win_message = `Boom! You crushed the ${selected_difficulty} level of ${selected_mode} mode in just ${attempts} attempts! and ${completion_time} seconds!`;
-                    if (selected_mode !== "1v1") {
-                        clearInterval(timerInterval);
-                    }else{
-                        if(player_score[0] > player_score[1]){
+                    if (selected_mode === "1v1") {
+                        if (player_score[0] > player_score[1]) {
                             win_title = "Player 1 Wins!"
-                        }else if(player_score[0] < player_score[1]){
+                        } else if (player_score[0] < player_score[1]) {
                             win_title = "Player 2 Wins!"
-                        }else{
+                        } else {
                             win_title = "Both Win!"
                         }
+                        win_message = `Player 1 score ${player_score[0]} : Player 2 score ${player_score[1]}`;
+                    } else {
+                        if(selected_mode === "timer"){
+                            win_message = `Boom! You crushed the ${selected_difficulty} level of ${selected_mode} mode in just ${attempts} attempts! and ${completion_time} seconds left.`;
+                        }
+                        clearInterval(timerInterval);
                     }
                     showScreen(win_title, win_message);
                 }
-            }, 500);
+            }, selected_mode === "1v1" ? 1000 : 500);
 
         } else {
             resetTurn();
         }
     }
+});
+
+pause_button.addEventListener('click', ()=>{
+    isPlaying = false;
+    resume_button_div.classList.remove('hidden');
+    pause_button_div.classList.add('hidden');
+    clearInterval(timerInterval);
+});
+
+
+resume_button.addEventListener('click', ()=>{
+    isPlaying = true;
+    resume_button_div.classList.add('hidden');
+    pause_button_div.classList.remove('hidden');
+    startInterval();
 });
