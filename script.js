@@ -98,35 +98,39 @@ function resetGame() {
     document.querySelector("#win-screen").classList.add("hidden");
     document.querySelector(".timer").classList.add("hidden");
     document.querySelector(".game-container").classList.remove("hidden");
+    attempts = 0;
 }
 
-function resetTurn(){
-
+function resetTurn() {
+    click_counter = 0;
+    clicked_index = -1;
+    selected_cards = [];
+    parent_cards = [];
 }
 
-function playingGame(difficulty_, game_mode = "basic", time = 30) {
+function playingGame(difficulty_, game_mode = "basic", time = 0) {
 
-    switch (difficulty_) {
-        case "easy": pairs = 8, time = 30;
+    if(game_mode === "timer"){
+        switch (difficulty_) {
+            case "easy": pairs = 8, time = 30;
             break;
-        case "medium": pairs = 18, time = 120; 
+            case "medium": pairs = 18, time = 120;
             break;
-        case "hard": pairs = 32, time = 240;
+            case "hard": pairs = 32, time = 240;
             break;
-        case "extreme": pairs = 50, time = 360;
+            case "extreme": pairs = 50, time = 360;
             break;
-        default: pairs = 8, time = 30;
+            default: pairs = 8, time = 30;
+        }
     }
     
-
-    if (game_mode === "timer") {
-        document.querySelector(".timer").classList.remove("hidden");
-    }
-
     const timerInterval = setInterval(() => {
         if (game_mode === "timer") {
-            timer_elem.innerText = time;
             time--;
+            timer_elem.innerText = time;
+        }else if(game_mode === "basic"){
+            time++;
+            timer_elem.innerText = time;
         }
         if (time < 0) {
             click_counter = 0;
@@ -137,6 +141,12 @@ function playingGame(difficulty_, game_mode = "basic", time = 30) {
             clearInterval(timerInterval);
             showScreen("😝 You Loose! 😝", "");
             return;
+        }
+    }, 1000);
+    
+    setTimeout(()=>{
+        if (game_mode === "timer" || game_mode === "basic") {
+            document.querySelector(".timer").classList.remove("hidden");
         }
     }, 1000);
 }
@@ -178,6 +188,7 @@ difficulty.addEventListener("click", (event) => {
 
 let timer_elem = document.querySelector("#time");
 let timerInterval;
+let attempts = 0;
 let click_counter = 0;
 let clicked_index = -1;
 let selected_cards = [];
@@ -197,10 +208,11 @@ home_button.addEventListener('click', () => {
 });
 
 card_area.addEventListener("mousedown", (event) => {
-        
+
     if (event.target.dataset.name !== undefined && clicked_index !== event.target.dataset.index && !matched_cards.includes(event.target.dataset.index) && click_counter < 2) {
         console.log(pairs);
         click_counter++;
+        attempts++;
         parent_cards.push(event.target.closest('.card'));
         addRemoveClasses(parent_cards, "flipped", "add");
 
@@ -226,7 +238,6 @@ card_area.addEventListener("mousedown", (event) => {
                     let win_title = "🎉 You Win! 🎉";
                     let win_message = "";
                     showScreen(win_title, win_message);
-                    return;
                 }
             }, 500);
 
