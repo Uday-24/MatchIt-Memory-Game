@@ -333,3 +333,27 @@ resume_button.addEventListener('click', ()=>{
     pause_button_div.classList.remove('hidden');
     startInterval();
 });
+
+const about_me_btn = document.querySelector("#about-me-button");
+const about_me_colose_btn = document.querySelector(".close-about-me-btn");
+const about_me_cont = document.querySelector(".about-me-overlay");
+
+about_me_btn.addEventListener('click', ()=>{
+    about_me_cont.classList.remove("hidden");
+});
+
+about_me_colose_btn.addEventListener('click', ()=>{
+    about_me_cont.classList.add("hidden");
+});
+
+const tips_button = document.querySelector('.tips button');
+const tips_overlay = document.getElementById('tipsOverlay');
+const close_TipsBtn = document.querySelector('.close-tips-btn');
+
+tips_button.addEventListener('click', () => {
+    tips_overlay.classList.remove('hidden');
+});
+
+close_TipsBtn.addEventListener('click', () => {
+    tips_overlay.classList.add('hidden');
+});
