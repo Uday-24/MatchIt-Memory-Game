@@ -493,6 +493,10 @@ header {
     text-align: center;
 
     .about-me-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 20px;
       h2 {
         font-family: 'Lemon', cursive;
         font-size: 30px;
@@ -500,10 +504,27 @@ header {
         text-shadow: 0 0 10px #00baff, 0 0 20px #00baff;
         margin-bottom: 10px;
       }
+
+      .close-about-me-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 28px;
+        color: #ff4b5c;
+        transition: transform 0.3s ease, color 0.3s ease;
+        text-shadow: 0 0 5px #ff4b5c, 0 0 10px #ff4b5c;
+    
+        &:hover {
+          color: #ffffff;
+          transform: scale(1.2);
+          text-shadow: 0 0 10px #ff4b5c, 0 0 20px #ff4b5c;
+        }
+      }
     }
     
     .my-name {
       h1 {
+        text-align: start;
         font-family: 'Sour Gummy', cursive;
         font-size: 36px;
         font-weight: 700;
@@ -515,6 +536,7 @@ header {
 
     .my-info {
       p {
+        text-align: justify;
         font-size: 16px;
         line-height: 1.8;
         color: #c9c9c9;
@@ -556,27 +578,6 @@ header {
               color: #fff;
             }
           }
-        }
-      }
-    }
-    .close-about-me {
-      position: absolute;
-      top: 20px;
-      right: 25px;
-    
-      .close-about-me-btn {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        font-size: 28px;
-        color: #ff4b5c;
-        transition: transform 0.3s ease, color 0.3s ease;
-        text-shadow: 0 0 5px #ff4b5c, 0 0 10px #ff4b5c;
-    
-        &:hover {
-          color: #ffffff;
-          transform: scale(1.2);
-          text-shadow: 0 0 10px #ff4b5c, 0 0 20px #ff4b5c;
         }
       }
     }
