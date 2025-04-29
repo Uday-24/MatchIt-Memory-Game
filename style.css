@@ -280,9 +280,14 @@ header {
       transform-style: preserve-3d;
 
       /* Testing purpose only start */
-      /* i{
+      /* display: flex;
+      align-items: center;
+      justify-content: center;
+      i{
+        top: 10px;
         color: white;
         text-align: center;
+        z-index: 10000;
       } */
       /* Testing purpose only end */
 
